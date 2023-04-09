@@ -30,7 +30,7 @@ while True:
 
     # Gaussian Blur
     blurred = cv2.GaussianBlur(gray, (3, 3), 10)
-    cv2.imshow('blurred', blurred)
+    #cv2.imshow('blurred', blurred)
 
     # Kernel to sharpen the image.
     #sharpen_kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
@@ -41,7 +41,6 @@ while True:
     # Find the edges in the image using Canny edge detection
 
     edges = cv2.Canny(blurred, 40, 150, apertureSize=3)
-    cv2.imshow('edges', edges)
 
     # Find the contours of the edges
     contours, hierarchy = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -57,11 +56,19 @@ while True:
                 x, y, w, h = cv2.boundingRect(approx)
                 if w > 0.7 * square_size and h > 0.7 * square_size and w < 1.3 * square_size and h < 1.3 * square_size:
                     pass
-                    #cv2.putText(img, str(num_coutours), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
-                    #cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    cv2.putText(img, str(num_coutours), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
+                    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            elif len(approx) > 2:
+                x, y, w, h = cv2.boundingRect(approx)
+                if w > 0.7 * square_size and h > 0.7 * square_size and w < 1.3 * square_size and h < 1.3 * square_size:
+                    pass
+                    cv2.putText(img, "piece", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
+                    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     # Display the image with the chessboard highlighted
-    #cv2.putText(img, str(num_coutours), (575,35), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0,255,0))
+    cv2.putText(img, str(num_coutours), (575,35), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0,255,0))
+    
+    cv2.imshow('edges', edges)
     cv2.imshow('Chessboard', img)
 
     # Exit the loop if the 'q' key is pressed
