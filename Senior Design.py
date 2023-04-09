@@ -143,9 +143,8 @@ class MotorPage(Frame):
     
 
 
-                    
+'''
 if __name__=="__main__":
     app = ChessBot()
     app.mainloop()
-        
-        
+'''
