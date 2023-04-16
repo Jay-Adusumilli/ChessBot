@@ -56,14 +56,12 @@ while True:
                 x, y, w, h = cv2.boundingRect(approx)
                 if w > 0.7 * square_size and h > 0.7 * square_size and w < 1.3 * square_size and h < 1.3 * square_size:
                     pass
-                    cv2.putText(img, str(num_coutours), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
-                    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    #cv2.putText(img, str(num_coutours), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
+                    #cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
             elif len(approx) > 2:
                 x, y, w, h = cv2.boundingRect(approx)
-                if w > 0.7 * square_size and h > 0.7 * square_size and w < 1.3 * square_size and h < 1.3 * square_size:
-                    pass
-                    cv2.putText(img, "piece", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
-                    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.putText(img, "piece", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
+                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     # Display the image with the chessboard highlighted
     cv2.putText(img, str(num_coutours), (575,35), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0,255,0))
