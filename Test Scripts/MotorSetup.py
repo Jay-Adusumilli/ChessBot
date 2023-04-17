@@ -109,10 +109,10 @@ class RobotController():
         self.currentAngle = currentAngle
         self.base = Base()
         self.servoDirection = [1,1,1,1]
-        self.Arms = [Arm(Armlength[0], self.servoDirection, ), Arm(Armlength[1], self.servoDirection), Arm(Armlength[2], self.servoDirection), Arm(Armlength[3], self.servoDirection), Arm(Armlength[3], self.servoDirection)] 
+        self.Arms = [Arm(Armlength[0], self.servoDirection, ), Arm(Armlength[1], self.servoDirection), Arm(Armlength[2], self.servoDirection), Arm(Armlength[3], self.servoDirection)] 
          
     def numberServos(self, desiredAngle):
-        servoNum = list(range(5))
+        servoNum = list(range(4))
         for i in range(len(servoNum)):
             if self.currentAngle[i] != desiredAngle[i]:
                 servoNum[i] = 1
@@ -151,7 +151,7 @@ class RobotController():
 #                     print(self.currentAngle[i])
                 else:
                     self.currentAngle[i] = self.Arms[i].setAngle(i , self.currentAngle[i])
-            sleep(.001)
+            sleep(.0025)
             
 class RobotFrame():
     def __init__(self):
@@ -196,18 +196,18 @@ class RobotFrame():
 class Robot():
     def __init__(self, startingAngle):
         self.m = RobotMath()
-        self.armMag = [0, 4.1, 4, 0, 0]
-        self.armAngle = [95,86,230, 25, 50]
+        self.armMag = [0, 4.1, 4, 0]
+        self.armAngle = [95,86,230, 25]
         self.basePosition = [5.2, -2, 4.2]
         self.A0 = [0,0,0]
         self.startingAngle = startingAngle
-        self.currentAngle = [0,0,0,0,0]
+        self.currentAngle = [0,0,0,0]
         for i in range(len(startingAngle)):
             self.currentAngle[i] += startingAngle[i]
         self.controller = RobotController(self.currentAngle, self.armMag)
         self.frame = RobotFrame()
         self.armAnglerelative = self.frame.frameAngles()
-#         print(self.armAnglerelative)
+        print(self.armAnglerelative)
 
         
     def startingPosition(self):
@@ -219,7 +219,6 @@ class Robot():
         
 
     def Move(self, desiredAngle):
-        print(desiredAngle)
         self.controller.servoMove(desiredAngle)
         
                   
@@ -236,10 +235,10 @@ class Robot():
 
 # self.currentAngle = [50, 150, 150,150]
 
-# r = Robot([90, 80, 50,170])
+# r = Robot([90, 80, 30,120])
 # r.startingPosition()
-# # desiredAngle = [90, 120, 120,120]
-# # r.Move(desiredAngle)
+# desiredAngle = [90, 120, 120,120]
+# r.Move(desiredAngle)
 # r.returnMove()
 # r.headPosition()
         

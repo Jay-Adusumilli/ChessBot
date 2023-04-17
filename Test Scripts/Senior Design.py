@@ -53,16 +53,16 @@ class MotorPage(Frame):
         self.Digitalset = ['Output High', 'Output Low', 'Input']
 #         print(self.Digitalpins[0].split())
         
-        self.motorNum = ['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4', 'Motor 5']
-        self.motorVal = [0,0,0,0,0]
+        self.motorNum = ['Motor 1', 'Motor 2', 'Motor 3', 'Motor 4']
+        self.motorVal = [0,0,0,0]
         
 
         pins = self.Pins.Pinlist()
         outhigh = []
         outlow = []
         inputlabel = []
-        startingAngle = [179, 130.75, 91, 157, 120]
-        self.currentAngle = [179, 130.75, 91, 157, 120]
+        startingAngle = [90, 80, 30,120]
+        self.currentAngle = [90, 80, 30,120]
         self.robot = Robot(startingAngle)
         self.robot.startingPosition()
         
@@ -71,10 +71,6 @@ class MotorPage(Frame):
             
         for i in range(len(self.currentAngle)):
             self.motorList(i)
-            
-        Button(self, text = 'Origin', command = lambda : self.originMove()).grid(row =1,column=8)
-            
-        Button(self, text = 'Center', command = lambda : self.centerMove()).grid(row =2,column=8)
         
     def GPIOlist(self, i):
         Label(self, text = self.Digitalpins[i], fg="black", bg="white", width = 10).grid(row=i,column = 0)
@@ -115,14 +111,6 @@ class MotorPage(Frame):
         if i == 2:
             self.Pins.Output(i)
             
-    def originMove(self):
-        self.currentAngle = [179, 130.75, 91, 157, 120]
-        self.robot.Move(self.currentAngle)
-        
-    def centerMove(self):
-        self.currentAngle = [90, 85.25, 101.0, 172, 105]
-        self.robot.Move(self.currentAngle)
-            
     
  
 #         for i in range(len(pins)):
@@ -155,9 +143,8 @@ class MotorPage(Frame):
     
 
 
-                    
+'''
 if __name__=="__main__":
     app = ChessBot()
     app.mainloop()
-        
-        
+'''

@@ -2,26 +2,17 @@ import board, busio, adafruit_pca9685
 from adafruit_servokit import ServoKit
 import adafruit_motor.servo
 
-import RPi.GPIO as GPIO
-from gpiozero import Servo
-from gpiozero.pins.pigpio import PiGPIOFactory
-
-
 class Communication():
     def __init__(self):
-        self.i2c = busio.I2C(board.SCL, board.SDA)
-        
-#         self.i2c = board.I2C()
+        self.i2c = board.I2C()
         self.pca = adafruit_pca9685.PCA9685(self.i2c)
         self.kit = ServoKit(channels = 16)
         self.pca.frequency = 50
-# #         self.servo0 = adafruit_motor.servo.Servo(0)
+#         self.servo0 = adafruit_motor.servo.Servo(0)
         
     def PCA(self, i, angle):
         self.kit.servo[i].angle = angle
 #         self.servo0 = angle
-
-
  
 
 class Pintext():
@@ -110,9 +101,8 @@ class Pins():
     def Input(self, num):
         GPIO.input(num)
         
-
-# c = Communication()
-# c.PCA(4, 90)
+        
+                
 #         
 # p1 = Pins(Pintext)
 # p1.Labelbuidler('Output', 'High')

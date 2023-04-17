@@ -1,16 +1,16 @@
 from stockfish import Stockfish
 
 class Match:
-  def __init__(bot, Pboardstate, Cboardstate, elo, depth, path, moveTime):
+  def __init__(bot, elo, depth, path, moveTime):
     bot.Pboardstate = [['br1', 'bn1', 'bb1', 'bq', 'bk', 'bb2', 'bn2', 'br2'], #should always be from start on init
-                ['bp1', 'bp2', 'bp3', 'bp4', 'bp5', 'bp6', 'bp7', 'bp8'], 
-                ['-', '-', '-', '-', '-', '-', '-', '-'], 
-                ['-', '-', '-', '-', '-', '-', '-', '-'], 
-                ['-', '-', '-', '-', '-', '-', '-', '-'], 
-                ['-', '-', '-', '-', '-', '-', '-', '-'], 
-                ['wp1', 'wp2', 'wp3', 'wp4', 'wp5', 'wp6', 'wp7', 'wp8'],
-                ['wr1', 'wn1', 'wb1', 'wq', 'wk', 'wb2', 'wn2', 'wr2']]
-    bot.Cboardstate = Cboardstate
+                        ['bp1', 'bp2', 'bp3', 'bp4', 'bp5', 'bp6', 'bp7', 'bp8'], 
+                        ['-', '-', '-', '-', '-', '-', '-', '-'], 
+                        ['-', '-', '-', '-', '-', '-', '-', '-'], 
+                        ['-', '-', '-', '-', '-', '-', '-', '-'], 
+                        ['-', '-', '-', '-', '-', '-', '-', '-'], 
+                        ['wp1', 'wp2', 'wp3', 'wp4', 'wp5', 'wp6', 'wp7', 'wp8'],
+                        ['wr1', 'wn1', 'wb1', 'wq', 'wk', 'wb2', 'wn2', 'wr2']]
+    bot.Cboardstate = bot.Pboardstate
     bot.moveTime = moveTime #2000
     bot.elo = elo #850
     bot.depth = depth #15
@@ -81,6 +81,7 @@ class Match:
         return illegal
     
     def stockfishMove():
+        bot.Pboardstate = bot.Cboardstate
         stockfish_move = stockfish.get_best_move_time(bot.moveTime)
         stockfish.make_moves_from_current_position([stockfish_move])
         if (stockfish.will_move_be_a_capture(stockfish_move) == stockfish.Capture.DIRECT_CAPTURE):
