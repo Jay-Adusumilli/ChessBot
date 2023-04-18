@@ -163,7 +163,7 @@ def mainLoop(root, v, app, stock):
 
 # Run the main loop.
 if __name__ == "__main__":
-    stock = Match(ELO, 15, PATH_TO_STOCKFISH, MOVETIME)            # Initialize the UCI translation system and stockfish.
+    stock = Match(ELO, 15, MOVETIME)            # Initialize the UCI translation system and stockfish.
     #stock = 0
     v = vision(True)                                                # Initialize and run the computer vision.
     root = tk.Tk()                                                  # Start the HID app.

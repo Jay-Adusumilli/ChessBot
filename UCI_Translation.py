@@ -1,7 +1,7 @@
 from stockfish import Stockfish
 
 class Match:
-  def __init__(bot, elo, depth, path, moveTime):
+  def __init__(bot, elo, depth, moveTime):
     bot.Pboardstate = [['br1', 'bn1', 'bb1', 'bq', 'bk', 'bb2', 'bn2', 'br2'], #should always be from start on init
                         ['bp1', 'bp2', 'bp3', 'bp4', 'bp5', 'bp6', 'bp7', 'bp8'], 
                         ['-', '-', '-', '-', '-', '-', '-', '-'], 
@@ -14,8 +14,9 @@ class Match:
     bot.moveTime = moveTime #2000
     bot.elo = elo #850
     bot.depth = depth #15
-    bot.path = path
-    stockfish = Stockfish(path=bot.path)
+    #bot.path = r"C:\Users\Jay\Documents\_Clemson\Senior Design\stockfish_15.1_win_x64_avx2"
+    #stockfish = Stockfish(path=bot.path)
+    stockfish = Stockfish(path=r"C:\Users\Jay\Documents\_Clemson\Senior Design\stockfish_15.1_win_x64_avx2\stockfish-window-2022-x86-64-avx2")
     stockfish.set_elo_rating(bot.elo)
     stockfish.set_depth(bot.depth)
 
