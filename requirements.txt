@@ -2,4 +2,3 @@ stockfish
 opencv-python
 numpy
 tk
-Pillow

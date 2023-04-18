@@ -4,24 +4,22 @@ The main loop calls the vision system and the UCI translation system.
 The GUI is used to display the current state of the game and to allow the user to interact with the bot.
 '''
 
-
 # Imports.
 import tkinter as tk
 import tkinter.font as tkFont
 from vision import vision
 from UCI_Translation import Match
-from PIL import ImageTk
 from time import sleep
 
 
-MAIN_LOOP_DELAY = 10                    # Control how fast the main loop runs (in ms).
+MAIN_LOOP_DELAY = 100                    # Control how fast the main loop runs (in ms).
 CURRENT_STATE = "WATING TO START"       # The current state of the game.
 STARTED = False                         # Whether the game has started or not.
 PLAYER_TURN = True                      # Whether it is the player's turn or not.
 PLAYER_SIDE = "w"                       # Whether the player is white or black.
 
 ELO = 850                               # The bots ELO rating.
-PATH_TO_STOCKFISH = "C:\\Users\\Jay\\Documents\\_Clemson\\Senior Design\\stockfish_15.1_win_x64_avx2.exe"     # The path to the stockfish executable.
+PATH_TO_STOCKFISH = r"C:/Users/Jay/Documents/_Clemson/Senior Design/stockfish_15.1_win_x64_avx2.exe"     # The path to the stockfish executable.
 MOVETIME = 5                           # The time the bot has to make a move (in seconds).
 
 class App():

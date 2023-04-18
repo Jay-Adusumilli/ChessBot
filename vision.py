@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from PIL import Image
 
 class vision:
     # Initialize the class.
@@ -40,9 +39,10 @@ class vision:
                 x += dist
             y += dist
 
+        vision.board_edges = [[top_left[0]-dist-5,top_left[1]-dist-5], [top_left[0] + dist * 8 + 5, top_left[1] + dist * 8 + 5]]
 
         # How far to look from the center of the square.
-        vision.radius = 10
+        vision.radius = 8
 
         # Map the colors to a piece on the board.
         vision.color_map = {
@@ -67,15 +67,15 @@ class vision:
         #vision.pink_color = [332, 52.1, 94.1]
         # Lower bounds.
         vision.red_color_lower = [0, 50, 50]
-        vision.blue_color_lower = [100, 150, 100]
-        vision.green_color_lower = [35, 50, 100]
-        vision.yellow_color_lower = [20, 150, 150]
-        vision.orange_color_lower = [10, 125, 125]
+        vision.blue_color_lower = [90, 140, 140]
+        vision.green_color_lower = [65, 70, 70]
+        vision.yellow_color_lower = [20, 100, 100]
+        vision.orange_color_lower = [10, 50, 50]
         vision.pink_color_lower = [155, 50, 50]
         # Upper bounds.
         vision.red_color_upper = [10, 255, 255]
         vision.blue_color_upper = [120, 255, 255]
-        vision.green_color_upper = [90, 255, 150]
+        vision.green_color_upper = [90, 255, 220]
         vision.yellow_color_upper = [50, 255, 255]
         vision.orange_color_upper = [20, 255, 255]
         vision.pink_color_upper = [180, 255, 255]
@@ -120,10 +120,14 @@ class vision:
         #blurred = cv2.GaussianBlur(gray, (3, 3), 10)
         #edges = cv2.Canny(blurred, 40, 150, apertureSize=3)
 
+        # Draw dots on the board corners.
+        cv2.circle(img, (vision.board_edges[0][0], vision.board_edges[0][1]), radius=1, color=(0, 255, 0), thickness=-1)
+        cv2.circle(img, (vision.board_edges[1][0], vision.board_edges[1][1]), radius=1, color=(0, 255, 0), thickness=-1)
+        cv2.circle
 
         vision.color_masks = {}
-        vision.found_circles = []       # [X, Y, R, color]
-        vision.found_rects = []         # [X, Y, R, color]
+        vision.found_black = []         # [X, Y, R, color]
+        vision.found_white = []         # [X, Y, R, color]
 
         # Loop through all colors and find colored circles and rectangles.
         for color in vision.color_ranges:
@@ -132,30 +136,35 @@ class vision:
                 mask2 = cv2.inRange(hsv, vision.lower_red2, vision.upper_red2)
                 vision.color_masks[color] = cv2.bitwise_or(vision.color_masks[color], mask2)
             
-            blurred = cv2.GaussianBlur(vision.color_masks[color], (3, 3), 10)                                           # Blur the image to improve the contours.
-            edges = cv2.Canny(blurred, 40, 150, apertureSize=3)                                                         # Find canny edges.
+            #blurred = cv2.GaussianBlur(vision.color_masks[color], (3, 3), 10)                                           # Blur the image to improve the contours.
+            kernel = np.ones((5,5), np.uint8)
+            morph = cv2.morphologyEx(vision.color_masks[color], cv2.MORPH_CLOSE, kernel)                                # Fill in the gaps to imporove contours.
+            edges = cv2.Canny(morph, 10, 200, apertureSize=3)                                                           # Find canny edges.
             contours, hierarchy = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)                       # Get list of contours.
             # Loop through all countours.
             for contour in contours:
                 area = cv2.contourArea(contour)                                                                         # Get the area of the contour and move on if its >200.
-                if area > 400:
+                if area > 200 and area < 1000:
                     # Get the number of lines in the polygon detetcted.
                     perimeter = cv2.arcLength(contour, True)
                     approx = cv2.approxPolyDP(contour, 0.04 * perimeter, True)
-                    # If a rectange is found.
-                    if len(approx) == 4:
-                        x, y, w, h = cv2.boundingRect(approx)
-                        text = vision.color_map[color]
-                        cv2.putText(img, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
-                        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                        vision.found_rects.append([x + (w/2), y + (h/2), (w/2), color])
                     # If a circle is found.
-                    if len(approx) > 4:
-                        x, y, w, h = cv2.boundingRect(approx)
-                        text = vision.color_map[color]
-                        cv2.putText(img, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
-                        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                        vision.found_circles.append([x + (w/2), y + (h/2), (w/2), color])
+                    if len(approx) > 3:
+                        # Draw a circle around the circle found.
+                        (x, y), radius = cv2.minEnclosingCircle(contour)
+                        center = (int(x), int(y))
+                        radius = int(radius)
+                        if x > vision.board_edges[0][0] and x < vision.board_edges[1][0] and y > vision.board_edges[0][1] and y < vision.board_edges[1][1]: # Check if the circle is in the board.
+                            cv2.circle(img, center, radius=1, color=(0, 255, 0), thickness=-1)
+                            cv2.circle(img, center, radius, (0, 255, 0), 2)
+                            if morph[center[1], center[0]] == 0:                                                                # Check if the center is black
+                                vision.found_black.append([x, y, radius, color, False])
+                                text = "b" + vision.color_map[color]
+                                cv2.putText(img, text, (center[0] + 20, center[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
+                            elif morph[center[1], center[0]] == 255:                                                            # Check if the center is white
+                                vision.found_white.append([x, y, radius, color, False])
+                                text = "w" + vision.color_map[color]
+                                cv2.putText(img, text, (center[0] + 20, center[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))                        
 
         # Make sure there are only a certain number of pieces on the board.
         num_pieces = {
@@ -168,22 +177,24 @@ class vision:
         }
         # Test each shape found to determine if its in a square.
         # ((x2 - x1)**2 + (y2 - y1)**2)**0.5 <= r1 + r2    <- Determines if two circles intersect or are inside each other.
-        for shape in vision.found_circles:  
-            for i, row in enumerate(vision.board_positions):
-                for j, square in enumerate(row):
-                    if (((shape[0] - square[0])**2 + (shape[1] - square[1])**2)**0.5 <= shape[2] + vision.radius) and vision.board[i][j] == "-":
-                        # Shape is in point, add it to the board position.
-                        # Make sure there are only a certain number of pieces on the board.
-                        piece = vision.color_map[shape[3]]
-                        num_pieces[piece][0] += 1
-                        if num_pieces[piece][0] <= num_pieces[piece][1]:
-                            out = "b" + piece + str(num_pieces[piece][0])
-                            #print(out)
-                            vision.board[i][j] = out     # Add the black piece to the board.
-                            break
-                            #print(vision.board)
+        for shape in vision.found_black:
+            if shape[4] == False:
+                for i, row in enumerate(vision.board_positions):
+                    for j, square in enumerate(row):
+                        if (((shape[0] - square[0])**2 + (shape[1] - square[1])**2)**0.5 <= shape[2] + vision.radius) and vision.board[i][j] == "-":
+                            shape[4] = True
+                            # Shape is in point, add it to the board position.
+                            # Make sure there are only a certain number of pieces on the board.
+                            piece = vision.color_map[shape[3]]
+                            num_pieces[piece][0] += 1
+                            if num_pieces[piece][0] <= num_pieces[piece][1]:
+                                out = "b" + piece + str(num_pieces[piece][0])
+                                #print(out)
+                                vision.board[i][j] = out     # Add the black piece to the board.
+                                break
+                                #print(vision.board)
         #cv2.putText(img, str(num_pieces), (7, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
-        #cv2.putText(img, str(len(vision.found_circles)), (7, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
+        #cv2.putText(img, str(len(vision.found_black)), (7, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0))
         # Reset values.
         num_pieces = {
             "p": [0,8],
@@ -193,35 +204,38 @@ class vision:
             "q": [0,3],
             "k": [0,1]
         }
-        for shape in vision.found_rects:
-            for i, row in enumerate(vision.board_positions):
-                for j, square in enumerate(row):
-                    if (((shape[0] - square[0])**2 + (shape[1] - square[1])**2)**0.5 <= shape[2] + vision.radius) and vision.board[i][j] == "-":
-                        # Shape is in point, add it to the board position.
-                        # Make sure there are only a certain number of pieces on the board.
-                        piece = vision.color_map[shape[3]]
-                        num_pieces[piece][0] += 1
-                        if num_pieces[piece][0] <= num_pieces[piece][1]:
-                            out = "w" + piece
-                            vision.board[i][j] = out    # Add the white piece to the board.
-                            break
-                            #print(vision.board)
+        for shape in vision.found_white:
+            if shape[4] == False:
+                for i, row in enumerate(vision.board_positions):
+                    for j, square in enumerate(row):
+                        if (((shape[0] - square[0])**2 + (shape[1] - square[1])**2)**0.5 <= shape[2] + vision.radius) and vision.board[i][j] == "-":
+                            shape[4] = True
+                            # Shape is in point, add it to the board position.
+                            # Make sure there are only a certain number of pieces on the board.
+                            piece = vision.color_map[shape[3]]
+                            num_pieces[piece][0] += 1
+                            if num_pieces[piece][0] <= num_pieces[piece][1]:
+                                out = "w" + piece + str(num_pieces[piece][0])
+                                vision.board[i][j] = out    # Add the white piece to the board.
+                                break
+                                #print(vision.board)
 
 
         #cv2.imshow("blurred",blurred)
         #cv2.imshow("edges", edges)
         if vision.show_image == True:
-            #cv2.imshow("red", vision.color_masks["red"])
-            #cv2.imshow("blue", vision.color_masks["blue"])
-            #cv2.imshow("green", vision.color_masks["green"])
-            #cv2.imshow("orange", vision.color_masks["orange"])
-            #cv2.imshow("pink", vision.color_masks["pink"])
-            #cv2.imshow("yellow", vision.color_masks["yellow"])
+            mask = vision.color_masks["green"]
+            cv2.imshow("mask", mask)
+            kernel = np.ones((5,5), np.uint8)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+            cv2.imshow("morph", mask)
+            edges = cv2.Canny(mask, 10, 200, apertureSize=3) 
+            cv2.imshow("edges", edges)
             # Draw the points onto the image.
             for i, row in enumerate(vision.board_positions):
                 for k, j in enumerate(row):
-                    #cv2.circle(img, (int(j[0]),int(j[1])), radius=1, color=(0, 0, 255), thickness=-1)
-                    cv2.putText(img, vision.board[i][k], (int(j[0]) - 3,int(j[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.25, (0, 0, 255))
+                    cv2.circle(img, (int(j[0]),int(j[1])), radius=vision.radius, color=(0, 0, 255), thickness=1)
+                    #cv2.putText(img, vision.board[i][k], (int(j[0]) - 3,int(j[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.25, (0, 0, 255))
                     pass
             cv2.imshow("CV", img)
         #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
