@@ -188,7 +188,7 @@ class vision:
                             piece = vision.color_map[shape[3]]
                             num_pieces[piece][0] += 1
                             if num_pieces[piece][0] <= num_pieces[piece][1]:
-                                out = "b" + piece + str(num_pieces[piece][0])
+                                out = "b" + piece
                                 #print(out)
                                 vision.board[i][j] = out     # Add the black piece to the board.
                                 break
@@ -215,7 +215,7 @@ class vision:
                             piece = vision.color_map[shape[3]]
                             num_pieces[piece][0] += 1
                             if num_pieces[piece][0] <= num_pieces[piece][1]:
-                                out = "w" + piece + str(num_pieces[piece][0])
+                                out = "w" + piece
                                 vision.board[i][j] = out    # Add the white piece to the board.
                                 break
                                 #print(vision.board)
@@ -224,13 +224,13 @@ class vision:
         #cv2.imshow("blurred",blurred)
         #cv2.imshow("edges", edges)
         if vision.show_image == True:
-            mask = vision.color_masks["green"]
-            cv2.imshow("mask", mask)
-            kernel = np.ones((5,5), np.uint8)
-            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-            cv2.imshow("morph", mask)
-            edges = cv2.Canny(mask, 10, 200, apertureSize=3) 
-            cv2.imshow("edges", edges)
+            #mask = vision.color_masks["green"]
+            #cv2.imshow("mask", mask)
+            #kernel = np.ones((5,5), np.uint8)
+            #mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+            #cv2.imshow("morph", mask)
+            #edges = cv2.Canny(mask, 10, 200, apertureSize=3) 
+            #cv2.imshow("edges", edges)
             # Draw the points onto the image.
             for i, row in enumerate(vision.board_positions):
                 for k, j in enumerate(row):

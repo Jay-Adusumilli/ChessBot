@@ -19,11 +19,15 @@ PLAYER_TURN = True                      # Whether it is the player's turn or not
 PLAYER_SIDE = "w"                       # Whether the player is white or black.
 
 ELO = 850                               # The bots ELO rating.
-PATH_TO_STOCKFISH = r"C:/Users/Jay/Documents/_Clemson/Senior Design/stockfish_15.1_win_x64_avx2.exe"     # The path to the stockfish executable.
 MOVETIME = 5                           # The time the bot has to make a move (in seconds).
 
 class App():
     def __init__(self, root):
+        App.MAIN_LOOP_DELAY = 100
+        App.CURRENT_STATE = "WATING TO START"
+        App.STARTED = False
+        App.PLAYER_TURN = True
+        App.PLAYER_SIDE = "w"
         # Define Vars.
         App.message_info_box_msg = "Test\ntest"
         # Set title.
@@ -58,7 +62,7 @@ class App():
         #App.name_label.place(x=0,y=0,width=40,height=20)
         App.name_label.grid(row = 0, column = 0, pady = 10, padx=10)
 
-
+        """
         # Start button.
         App.start_game_button=tk.Button(root)
         App.start_game_button["bg"] = "#f0f0f0"
@@ -69,7 +73,8 @@ class App():
         #App.test_button.place(x=390,y=170,width=120,height=25)
         App.start_game_button.grid(row = 1, column = 0, pady = 10, padx=10)
         App.start_game_button["command"] = self.startGame
-
+        """
+        """
         # Switch sides button.
         App.switch_sides_button=tk.Button(root)
         App.switch_sides_button["bg"] = "#f0f0f0"
@@ -80,6 +85,7 @@ class App():
         #App.test_button.place(x=390,y=170,width=120,height=25)
         App.switch_sides_button.grid(row = 2, column = 0, pady = 10, padx=10)
         App.switch_sides_button["command"] = self.switchSides
+        """
 
         # End move button.
         App.end_move_button=tk.Button(root)
@@ -89,7 +95,7 @@ class App():
         App.end_move_button["justify"] = "left"
         App.end_move_button["text"] = "End Move"
         #App.test_button.place(x=390,y=170,width=120,height=25)
-        App.end_move_button.grid(row = 3, column = 0, pady = 10, padx=10)
+        App.end_move_button.grid(row = 1, column = 0, pady = 10, padx=10)
         App.end_move_button["command"] = self.endMove
 
     # Start the game.
@@ -99,17 +105,15 @@ class App():
             PLAYER_TURN = True
         else:
             PLAYER_TURN = False
-
-    # Switch which side the player is on.
-    def switchSides(self):
-        if PLAYER_SIDE == "w":
-            PLAYER_SIDE = "b"
-        elif PLAYER_SIDE == "b":
-            PLAYER_SIDE = "w"
+        print("Started")
 
     # End the player's turn.
     def endMove(self):
-        PLAYER_TURN = False
+        app.PLAYER_TURN = False
+
+    # Update label text.
+    def update_label(self):
+        App.name_label["text"] = CURRENT_STATE
     
     # Update the text in the message box.
     def update_window(self):
@@ -123,9 +127,9 @@ class App():
     
 # The main loop that runs after the GUI loop.
 def mainLoop(root, v, app, stock):
-
     # Get the most up to date board.
     vision_board = v.update()
+    #stock.setPboardstate(vision_board) # Update the previous board state.
 
     # Update the text for debugging.
     visionboardprint = ""
@@ -133,26 +137,32 @@ def mainLoop(root, v, app, stock):
         visionboardprint = visionboardprint + str(vision_board[i]) + "\n"
     app.updateText(str(visionboardprint))
 
-
-    if STARTED != True:                         # Waiting to start.
-        CURRENT_STATE = "WATING TO START"
-    elif PLAYER_TURN == True:                   # Player's turn, just wait.
-        CURRENT_STATE = "PLAYER TURN"
-    elif PLAYER_TURN == False:                  # Computer's turn, run through the steps to make a move.
-        CURRENT_STATE = "COMPUTER TURN"
+    if app.PLAYER_TURN == True:                   # Player's turn, just wait.
+        app.CURRENT_STATE = "PLAYER TURN"
+        app.update_label()
+    elif app.PLAYER_TURN == False:                  # Computer's turn, run through the steps to make a move.
+        app.CURRENT_STATE = "COMPUTER TURN"
+        app.update_label()
         # TODO: 
         # Send the current board state to the UCI translation system and get the moves out.
-        #stock.playerMove(vision_board)
-        #stock.displayBoard()                   # Display the board for debugging.
-        #move = stock.stockFishMove()            # Get the move from stockfish.
+        print(vision_board)
+        print("1")
+        stock.displayBoard()
+        stock.playerMove(vision_board)
+        print("2")
+        stock.displayBoard()                   # Display the board for debugging.
+        move = stock.stockfishMove()            # Get the move from stockfish.
+        print(move)
+        print("3")
+        stock.displayBoard()
 
         # Send the list of moves to the arm.
 
         # Wait for the arm to finish moving.
 
         # Reset the vars to the player state.
-        sleep(2000)
-        PLAYER_TURN = True
+        sleep(2)
+        app.PLAYER_TURN = True
     
 
     # Call this function again until the GUI is closed.
@@ -163,7 +173,7 @@ def mainLoop(root, v, app, stock):
 
 # Run the main loop.
 if __name__ == "__main__":
-    stock = Match(ELO, 15, MOVETIME)            # Initialize the UCI translation system and stockfish.
+    stock = Match(ELO, 15, MOVETIME)                                # Initialize the UCI translation system and stockfish.
     #stock = 0
     v = vision(True)                                                # Initialize and run the computer vision.
     root = tk.Tk()                                                  # Start the HID app.
