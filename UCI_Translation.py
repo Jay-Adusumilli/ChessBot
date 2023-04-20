@@ -10,14 +10,14 @@ class Match:
         #                    ['-', '-', '-', '-', '-', '-', '-', '-'], 
         #                    ['wp1', 'wp2', 'wp3', 'wp4', 'wp5', 'wp6', 'wp7', 'wp8'],
         #                    ['wr1', 'wn1', 'wb1', 'wq', 'wk', 'wb2', 'wn2', 'wr2']]
-        Match.Pboardstate = [['-', '-', '-', 'wk', 'wq', '-', '-', '-'], #should always be from start on init
+        Match.Pboardstate = [['-', '-', '-', 'wq', 'wk', '-', '-', '-'], #should always be from start on init
                             ['-', '-', 'wp', 'wp', 'wp', 'wp', '-', '-'], 
                             ['-', '-', '-', '-', '-', '-', '-', '-'], 
                             ['-', '-', '-', '-', '-', '-', '-', '-'], 
                             ['-', '-', '-', '-', '-', '-', '-', '-'], 
                             ['-', '-', '-', '-', '-', '-', '-', '-'], 
                             ['-', '-', 'bp', 'bp', 'bp', 'bp', '-', '-'],
-                            ['-', '-', '-', 'bk', 'bq', '-', '-', '-']]
+                            ['-', '-', '-', 'bq', 'bk', '-', '-', '-']]
         
         Match.Cboardstate = Match.Pboardstate
         Match.moveTime = moveTime #2000
@@ -61,7 +61,7 @@ class Match:
                         piece = Match.Cboardstate[i][j]
                         piece2 = Match.Pboardstate[i][j]
                         to_coords[0] = chr(ord('a')+j)
-                        to_coords[1] = 8 - i
+                        to_coords[1] = 1 + i
                         cap = True
                     else:
                         print("Behavior undefined, please reset system.")
@@ -71,6 +71,7 @@ class Match:
 
         #For Stockfish
         move_input = from_coords[0] + str(from_coords[1]) + to_coords[0] + str(to_coords[1])
+        print("Move input: ", move_input)
         if Match.stockfish.is_move_correct(str(move_input)):
             Match.stockfish.make_moves_from_current_position([move_input])
             illegal = False
@@ -92,27 +93,49 @@ class Match:
     def stockfishMove(self):
         Match.Pboardstate = Match.Cboardstate
         stockfish_move = Match.stockfish.get_best_move_time(Match.moveTime)
+        print("stockfish move ", stockfish_move)
+        print(Match.stockfish.will_move_be_a_capture(stockfish_move))
         Match.stockfish.make_moves_from_current_position([stockfish_move])
-        #if (Match.stockfish.will_move_be_a_capture(stockfish_move) == Match.stockfish.Capture.DIRECT_CAPTURE):
-        #    return stockfish_move + 'x'
-        #elif (Match.stockfish.will_move_be_a_capture(stockfish_move) == Match.stockfish.Capture.EN_PASSANT):
-        #    return stockfish_move + 'x'
-        #else:
         return stockfish_move
+        if (Match.stockfish.will_move_be_a_capture(str(stockfish_move)) == Stockfish.Capture.DIRECT_CAPTURE):
+            return stockfish_move + 'x'
+        elif (Match.stockfish.will_move_be_a_capture(str(stockfish_move)) == Stockfish.Capture.EN_PASSANT):
+            return stockfish_move + 'x'
+        else:
+            return stockfish_move
         
-"""
+
 match = Match(850, 15, 2000)
+print("Before player move")
 match.displayBoard()
-vision_board = [['-', '-', '-', 'bq', 'bk', '-', '-', '-'],
-                ['-', '-', 'bp3', 'bp4', 'bp5', 'bp6', '-', '-'],
+vision_board = [['-', '-', '-', 'wq', 'wk', '-', '-', '-'],
+                ['-', '-', 'wp', 'wp', 'wp', '-', '-', '-'],
+                ['-', '-', '-', '-', '-', 'wp', '-', '-'],
                 ['-', '-', '-', '-', '-', '-', '-', '-'],
                 ['-', '-', '-', '-', '-', '-', '-', '-'],
                 ['-', '-', '-', '-', '-', '-', '-', '-'],
-                ['-', '-', 'wp3', '-', '-', '-', '-', '-'],
-                ['-', '-', '-', 'wp4', 'wp5', 'wp6', '-', '-'],
-                ['-', '-', '-', 'wq', 'wk', '-', '-', '-']]
+                ['-', '-', 'bp', 'bp', 'bp', 'bp', '-', '-'],
+                ['-', '-', '-', 'bq', 'bk', '-', '-', '-']]
 match.playerMove(vision_board)
+print("After player move")
 match.displayBoard()
 match.stockfishMove()
+print("After stockfish move")
 match.displayBoard()
-"""
+
+vision_board = [['-', '-', '-', 'wq', 'wk', '-', '-', '-'],
+                ['-', '-', '-', 'wp', 'wp', '-', '-', '-'],
+                ['-', '-', 'wp', '-', '-', 'wp', '-', '-'],
+                ['-', '-', '-', '-', '-', '-', '-', '-'],
+                ['-', '-', '-', '-', '-', '-', '-', '-'],
+                ['-', '-', '-', '-', '-', '-', '-', '-'],
+                ['-', '-', 'bp', 'bp', 'bp', 'bp', '-', '-'],
+                ['-', 'bq', '-', '-', 'bk', '-', '-', '-']]
+
+
+match.playerMove(vision_board)
+print("After player move")
+match.displayBoard()
+match.stockfishMove()
+print("After stockfish move")
+match.displayBoard()
