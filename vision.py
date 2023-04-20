@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from time import sleep
 
 class vision:
     # Initialize the class.
@@ -28,8 +29,8 @@ class vision:
         
 
         # Define the top left center of the board and how far the boxes are from each other.
-        top_left = [167, 105]
-        dist = 38
+        top_left = [445, 230]
+        dist = 67
         y = top_left[1]
         for i in vision.board_positions:
             x = top_left[0]
@@ -42,7 +43,7 @@ class vision:
         vision.board_edges = [[top_left[0]-dist-5,top_left[1]-dist-5], [top_left[0] + dist * 8 + 5, top_left[1] + dist * 8 + 5]]
 
         # How far to look from the center of the square.
-        vision.radius = 8
+        vision.radius = 15
 
         # Map the colors to a piece on the board.
         vision.color_map = {
@@ -70,15 +71,15 @@ class vision:
         vision.blue_color_lower = [90, 140, 140]
         vision.green_color_lower = [65, 70, 70]
         vision.yellow_color_lower = [20, 100, 100]
-        vision.orange_color_lower = [10, 50, 50]
+        vision.orange_color_lower = [5, 75, 75]
         vision.pink_color_lower = [155, 50, 50]
         # Upper bounds.
-        vision.red_color_upper = [10, 255, 255]
+        vision.red_color_upper = [3, 255, 255]
         vision.blue_color_upper = [120, 255, 255]
         vision.green_color_upper = [90, 255, 220]
         vision.yellow_color_upper = [50, 255, 255]
         vision.orange_color_upper = [20, 255, 255]
-        vision.pink_color_upper = [180, 255, 255]
+        vision.pink_color_upper = [170, 255, 255]
         
         vision.lower_red2 = np.array([170, 50, 50])
         vision.upper_red2 = np.array([180, 255, 255])
@@ -144,7 +145,7 @@ class vision:
             # Loop through all countours.
             for contour in contours:
                 area = cv2.contourArea(contour)                                                                         # Get the area of the contour and move on if its >200.
-                if area > 200 and area < 1000:
+                if area > 400 and area < 100000:
                     # Get the number of lines in the polygon detetcted.
                     perimeter = cv2.arcLength(contour, True)
                     approx = cv2.approxPolyDP(contour, 0.04 * perimeter, True)
@@ -224,13 +225,13 @@ class vision:
         #cv2.imshow("blurred",blurred)
         #cv2.imshow("edges", edges)
         if vision.show_image == True:
-            #mask = vision.color_masks["green"]
-            #cv2.imshow("mask", mask)
-            #kernel = np.ones((5,5), np.uint8)
-            #mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-            #cv2.imshow("morph", mask)
-            #edges = cv2.Canny(mask, 10, 200, apertureSize=3) 
-            #cv2.imshow("edges", edges)
+            mask = vision.color_masks["red"]
+            cv2.imshow("mask", mask)
+            kernel = np.ones((5,5), np.uint8)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+            cv2.imshow("morph", mask)
+            edges = cv2.Canny(mask, 10, 200, apertureSize=3) 
+            cv2.imshow("edges", edges)
             # Draw the points onto the image.
             for i, row in enumerate(vision.board_positions):
                 for k, j in enumerate(row):
@@ -246,15 +247,16 @@ class vision:
         vision.cap.release()
         cv2.destroyAllWindows()
 
-'''
-v = vision(True)
-while 1:
-    v.update()
-    # Exit the loop if the 'q' key is pressed
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        v.shutdown()
-        break
 
-v.shutdown()
+if __name__ == "__main__":
+    v = vision(True)
+    while 1:
+        #sleep(.5)
+        v.update()
+        # Exit the loop if the 'q' key is pressed
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            v.shutdown()
+            break
 
-'''
+    v.shutdown()
+

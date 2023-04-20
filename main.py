@@ -10,9 +10,11 @@ import tkinter.font as tkFont
 from vision import vision
 from UCI_Translation import Match
 from time import sleep
+import MotorSetup
+import SeniorDesign
 
 
-MAIN_LOOP_DELAY = 100                    # Control how fast the main loop runs (in ms).
+MAIN_LOOP_DELAY = 500                   # Control how fast the main loop runs (in ms).
 CURRENT_STATE = "WATING TO START"       # The current state of the game.
 STARTED = False                         # Whether the game has started or not.
 PLAYER_TURN = True                      # Whether it is the player's turn or not.
@@ -126,7 +128,7 @@ class App():
 
     
 # The main loop that runs after the GUI loop.
-def mainLoop(root, v, app, stock):
+def mainLoop(root, v, app, stock, robot):
     # Get the most up to date board.
     vision_board = v.update()
     #stock.setPboardstate(vision_board) # Update the previous board state.
@@ -143,6 +145,7 @@ def mainLoop(root, v, app, stock):
     elif app.PLAYER_TURN == False:                  # Computer's turn, run through the steps to make a move.
         app.CURRENT_STATE = "COMPUTER TURN"
         app.update_label()
+        
         # TODO: 
         # Send the current board state to the UCI translation system and get the moves out.
         print(vision_board)
@@ -157,16 +160,19 @@ def mainLoop(root, v, app, stock):
         stock.displayBoard()
 
         # Send the list of moves to the arm.
-
-        # Wait for the arm to finish moving.
-
+        pos1 = move[0] + move[1]
+        pos2 = move[2] + move[3]
+        
+        robot.moveSequence(pos1,pos2,True)
+        
+        
         # Reset the vars to the player state.
         sleep(2)
         app.PLAYER_TURN = True
     
 
     # Call this function again until the GUI is closed.
-    root.after(MAIN_LOOP_DELAY, mainLoop, root, v, app, stock)
+    root.after(MAIN_LOOP_DELAY, mainLoop, root, v, app, stock, robot)
 
 
 
@@ -175,9 +181,12 @@ def mainLoop(root, v, app, stock):
 if __name__ == "__main__":
     stock = Match(ELO, 15, MOVETIME)                                # Initialize the UCI translation system and stockfish.
     #stock = 0
-    v = vision(True)                                                # Initialize and run the computer vision.
+    startingAngle = [179, 130, 91, 157, 120]  
+    robot = MotorSetup.Robot(startingAngle)
+    robot.startingPosition()
+    v = vision(False)                                                # Initialize and run the computer vision.
     root = tk.Tk()                                                  # Start the HID app.
     app = App(root)
-    root.after(MAIN_LOOP_DELAY, mainLoop, root, v, app, stock)     # Run the main loop after starting the GUI.
+    root.after(MAIN_LOOP_DELAY, mainLoop, root, v, app, stock, robot)     # Run the main loop after starting the GUI.
     root.mainloop()                                                 # Start the GUI.
     v.shutdown()                                                    # Shutdown the vision system and tabs.

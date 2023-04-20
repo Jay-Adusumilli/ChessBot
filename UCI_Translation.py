@@ -10,14 +10,14 @@ class Match:
         #                    ['-', '-', '-', '-', '-', '-', '-', '-'], 
         #                    ['wp1', 'wp2', 'wp3', 'wp4', 'wp5', 'wp6', 'wp7', 'wp8'],
         #                    ['wr1', 'wn1', 'wb1', 'wq', 'wk', 'wb2', 'wn2', 'wr2']]
-        Match.Pboardstate = [['-', '-', '-', 'wk', 'wq', '-', '-', '-'], #should always be from start on init
+        Match.Pboardstate = [['-', '-', '-', 'wk', '-', '-', '-', '-'], #should always be from start on init
                             ['-', '-', 'wp', 'wp', 'wp', 'wp', '-', '-'], 
                             ['-', '-', '-', '-', '-', '-', '-', '-'], 
                             ['-', '-', '-', '-', '-', '-', '-', '-'], 
                             ['-', '-', '-', '-', '-', '-', '-', '-'], 
                             ['-', '-', '-', '-', '-', '-', '-', '-'], 
                             ['-', '-', 'bp', 'bp', 'bp', 'bp', '-', '-'],
-                            ['-', '-', '-', 'bk', 'bq', '-', '-', '-']]
+                            ['-', '-', '-', 'bk', '-', '-', '-', '-']]
         
         Match.Cboardstate = Match.Pboardstate
         Match.moveTime = moveTime #2000
@@ -25,10 +25,10 @@ class Match:
         Match.depth = depth #15
         #Match.path = r"C:\Users\Jay\Documents\_Clemson\Senior Design\stockfish_15.1_win_x64_avx2"
         #stockfish = Stockfish(path=Match.path)
-        Match.stockfish = Stockfish(path=r"C:\Users\Jay\Documents\_Clemson\SeniorDesign\stockfish_15.1_win_x64_avx2\stockfish-windows-2022-x86-64-avx2")
+        Match.stockfish = Stockfish(path="/home/austin/Senior Design/ChessBot/stockfish")
         Match.stockfish.set_elo_rating(Match.elo)
         Match.stockfish.set_depth(Match.depth)
-        Match.stockfish.set_fen_position('3qk3/2pppp2/8/8/8/8/2PPPP2/3QK3 w - - 0 0')
+        Match.stockfish.set_fen_position('4k3/2pppp2/8/8/8/8/2PPPP2/4K3 w - - 0 0')
 
     def setPboardstate(self, boardState):
         Match.Pboardstate = boardState
